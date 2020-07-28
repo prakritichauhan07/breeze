@@ -11,27 +11,27 @@ echo "" >> ${path}/group_vars/prometheus.yml.gotmpl
 echo "kube_prometheus_version: ${KubePrometheusVersion}" >> ${path}/group_vars/prometheus.yml
 echo "operator_version: ${PrometheusOperatorVersion}" >> ${path}/group_vars/prometheus.yml
 
-curl -L -o ${path}/file/kube-prometheus-v$KubePrometheusVersion-origin.tar.gz https://github.com/coreos/kube-prometheus/archive/master.tar.gz
+curl -L -o ${path}/file/kube-prometheus-master-origin.tar.gz https://github.com/coreos/kube-prometheus/archive/master.tar.gz
 
 cd ${path}/file/
-tar zxf kube-prometheus-v$KubePrometheusVersion-origin.tar.gz
+tar zxf kube-prometheus-master-origin.tar.gz
 
-for file in $(grep -lr "quay.io/coreos" kube-prometheus-$KubePrometheusVersion/manifests/); do cat $file |grep "quay.io/coreos" ; done > image-lists-temp.txt
-for file in $(grep -lr "grafana/grafana" kube-prometheus-$KubePrometheusVersion/manifests/); do cat $file |grep "grafana/grafana" ; done >> image-lists-temp.txt
-for file in $(grep -lr "quay.io/prometheus" kube-prometheus-$KubePrometheusVersion/manifests/); do cat $file |grep "quay.io/prometheus" ; done >> image-lists-temp.txt
-for file in $(grep -lr "gcr.io/" kube-prometheus-$KubePrometheusVersion/manifests/); do cat $file |grep "gcr.io/" ; done >> image-lists-temp.txt
-for file in $(grep -lr "jimmidyson/" kube-prometheus-$KubePrometheusVersion/manifests/); do cat $file |grep "jimmidyson/" ; done >> image-lists-temp.txt
+for file in $(grep -lr "quay.io/coreos" kube-prometheus-master/manifests/); do cat $file |grep "quay.io/coreos" ; done > image-lists-temp.txt
+for file in $(grep -lr "grafana/grafana" kube-prometheus-master/manifests/); do cat $file |grep "grafana/grafana" ; done >> image-lists-temp.txt
+for file in $(grep -lr "quay.io/prometheus" kube-prometheus-master/manifests/); do cat $file |grep "quay.io/prometheus" ; done >> image-lists-temp.txt
+for file in $(grep -lr "gcr.io/" kube-prometheus-master/manifests/); do cat $file |grep "gcr.io/" ; done >> image-lists-temp.txt
+for file in $(grep -lr "jimmidyson/" kube-prometheus-master/manifests/); do cat $file |grep "jimmidyson/" ; done >> image-lists-temp.txt
 
-prometheus_base_image=`cat kube-prometheus-$KubePrometheusVersion/manifests/prometheus-prometheus.yaml |grep "image: " |awk -F':' '{print $2}'`
-prometheus_image_tag=`cat kube-prometheus-$KubePrometheusVersion/manifests/prometheus-prometheus.yaml |grep "image: " |awk -F':' '{print $3}'`
+prometheus_base_image=`cat kube-prometheus-master/manifests/prometheus-prometheus.yaml |grep "image: " |awk -F':' '{print $2}'`
+prometheus_image_tag=`cat kube-prometheus-master/manifests/prometheus-prometheus.yaml |grep "image: " |awk -F':' '{print $3}'`
 
-alertmanager_base_image=`cat kube-prometheus-$KubePrometheusVersion/manifests/alertmanager-alertmanager.yaml |grep "image: " |awk -F':' '{print $2}'`
-alertmanager_image_tag=`cat kube-prometheus-$KubePrometheusVersion/manifests/alertmanager-alertmanager.yaml |grep "image: " |awk -F':' '{print $3}'`
+alertmanager_base_image=`cat kube-prometheus-master/manifests/alertmanager-alertmanager.yaml |grep "image: " |awk -F':' '{print $2}'`
+alertmanager_image_tag=`cat kube-prometheus-master/manifests/alertmanager-alertmanager.yaml |grep "image: " |awk -F':' '{print $3}'`
 
 echo $prometheus_base_image:$prometheus_image_tag >> image-lists-temp.txt
 echo $alertmanager_base_image:$alertmanager_image_tag >> image-lists-temp.txt
 
-rm -rf kube-prometheus-$KubePrometheusVersion
+rm -rf kube-prometheus-master
 
 sed "s/- --config-reloader-image=//g" image-lists-temp.txt > 1.txt
 sed "s/- --prometheus-config-reloader=//g" 1.txt > 2.txt
