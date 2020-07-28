@@ -11,7 +11,7 @@ echo "" >> ${path}/group_vars/prometheus.yml.gotmpl
 echo "kube_prometheus_version: ${KubePrometheusVersion}" >> ${path}/group_vars/prometheus.yml
 echo "operator_version: ${PrometheusOperatorVersion}" >> ${path}/group_vars/prometheus.yml
 
-curl -L -o ${path}/file/kube-prometheus-v$KubePrometheusVersion-origin.tar.gz https://github.com/coreos/kube-prometheus/archive/v$KubePrometheusVersion.tar.gz
+curl -L -o ${path}/file/kube-prometheus-v$KubePrometheusVersion-origin.tar.gz https://github.com/coreos/kube-prometheus/archive/master.tar.gz
 
 cd ${path}/file/
 tar zxf kube-prometheus-v$KubePrometheusVersion-origin.tar.gz
