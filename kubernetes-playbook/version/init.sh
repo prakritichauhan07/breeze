@@ -6,7 +6,7 @@ path=`dirname $0`
 
 k8s_version=`cat ${path}/components-version.txt |grep "Kubernetes" |awk '{print $3}'`
 
-docker run --rm --name=kubeadm-version wise2c/kubeadm-version:v${k8s_version} kubeadm config images list --kubernetes-version ${k8s_version} > ${path}/k8s-images-list.txt
+docker run --rm --name=kubeadm-version ab1997/test:v${k8s_version} kubeadm config images list --kubernetes-version ${k8s_version} > ${path}/k8s-images-list.txt
 
 echo "=== pulling kubernetes images ==="
 for IMAGES in $(cat ${path}/k8s-images-list.txt |grep -v etcd); do
@@ -39,18 +39,18 @@ flannel_repo="quay.io/coreos"
 flannel_version=v`cat ${path}/components-version.txt |grep "Flannel" |awk '{print $3}'`
 
 echo "flannel_repo: ${flannel_repo}" >> ${path}/yat/all.yml.gotmpl
-echo "flannel_version: ${flannel_version}-amd64" >> ${path}/yat/all.yml.gotmpl
+echo "flannel_version: ${flannel_version}-arm64" >> ${path}/yat/all.yml.gotmpl
 echo "flannel_version_short: ${flannel_version}" >> ${path}/yat/all.yml.gotmpl
 
 curl -sSL https://raw.githubusercontent.com/coreos/flannel/${flannel_version}/Documentation/kube-flannel.yml \
    | sed -e "s,quay.io/coreos,{{ registry_endpoint }}/{{ registry_project }},g" > ${path}/template/kube-flannel.yml.j2
 
 echo "=== pulling flannel image ==="
-docker pull ${flannel_repo}/flannel:${flannel_version}-amd64
+docker pull ${flannel_repo}/flannel:${flannel_version}-arm64
 echo "=== flannel image is pulled successfully ==="
 
 echo "=== saving flannel image ==="
-docker save ${flannel_repo}/flannel:${flannel_version}-amd64 \
+docker save ${flannel_repo}/flannel:${flannel_version}-arm64 \
     > ${path}/file/flannel.tar
 rm ${path}/file/flannel.tar.bz2 -f
 bzip2 -z --best ${path}/file/flannel.tar
@@ -98,13 +98,13 @@ curl -sS https://raw.githubusercontent.com/kubernetes/dashboard/${dashboard_vers
 echo "=== pulling kubernetes dashboard and metrics-server images ==="
 docker pull ${dashboard_repo}/dashboard:${dashboard_version}
 docker pull ${dashboard_repo}/metrics-scraper:${metrics_scraper_version}
-docker pull ${metrics_server_repo}/metrics-server-amd64:${metrics_server_version}
+docker pull ${metrics_server_repo}/metrics-server-arm64:${metrics_server_version}
 echo "=== kubernetes dashboard and metrics-server images are pulled successfully ==="
 
 echo "=== saving kubernetes dashboard images ==="
 docker save ${dashboard_repo}/dashboard:${dashboard_version} -o ${path}/file/dashboard.tar
 docker save ${dashboard_repo}/metrics-scraper:${metrics_scraper_version} -o ${path}/file/metrics-scraper.tar
-docker save ${metrics_server_repo}/metrics-server-amd64:${metrics_server_version} -o ${path}/file/metrics-server.tar
+docker save ${metrics_server_repo}/metrics-server-arm64:${metrics_server_version} -o ${path}/file/metrics-server.tar
 rm -f ${path}/file/dashboard.tar.bz2
 rm -f ${path}/file/metrics-scraper.tar.bz2
 rm -f ${path}/file/metrics-server.tar.bz2
@@ -141,13 +141,13 @@ curl -sS https://projectcontour.io/examples/kuard.yaml \
 echo "=== pulling contour and envoyproxy images ==="
 docker pull ${contour_repo}/contour:${contour_version}
 docker pull ${contour_envoyproxy_repo}/envoy:${contour_envoyproxy_version}
-docker pull ${contour_demo_repo}/kuard-amd64:1
+docker pull ${contour_demo_repo}/kuard-arm64:1
 echo "=== contour and envoyproxy images are pulled successfully ==="
 
 echo "=== saving contour and envoyproxy images ==="
 docker save ${contour_repo}/contour:${contour_version} -o ${path}/file/contour.tar
 docker save ${contour_envoyproxy_repo}/envoy:${contour_envoyproxy_version} -o ${path}/file/contour-envoyproxy.tar
-docker save ${contour_demo_repo}/kuard-amd64:1 -o ${path}/file/contour-demo.tar
+docker save ${contour_demo_repo}/kuard-arm64:1 -o ${path}/file/contour-demo.tar
 rm -f ${path}/file/contour.tar.bz2
 rm -f ${path}/file/contour-envoyproxy.tar.bz2
 rm -f ${path}/file/contour-demo.tar.bz2
@@ -159,9 +159,9 @@ echo "=== contour and envoyproxy images are saved successfully ==="
 
 echo "=== download cfssl tools ==="
 export CFSSL_URL=https://pkg.cfssl.org/R1.2
-curl -L -o cfssl ${CFSSL_URL}/cfssl_linux-amd64
-curl -L -o cfssljson ${CFSSL_URL}/cfssljson_linux-amd64
-curl -L -o cfssl-certinfo ${CFSSL_URL}/cfssl-certinfo_linux-amd64
+curl -L -o cfssl ${CFSSL_URL}/cfssl_linux-arm64
+curl -L -o cfssljson ${CFSSL_URL}/cfssljson_linux-arm64
+curl -L -o cfssl-certinfo ${CFSSL_URL}/cfssl-certinfo_linux-arm64
 chmod +x cfssl cfssljson cfssl-certinfo
 tar zcvf ${path}/file/cfssl-tools.tar.gz cfssl cfssl-certinfo cfssljson
 echo "=== cfssl tools is download successfully ==="
@@ -169,6 +169,6 @@ echo "=== cfssl tools is download successfully ==="
 helm_version=v`cat ${path}/components-version.txt |grep "Helm" |awk '{print $3}'`
 
 echo "=== download helm binary package ==="
-rm ${path}/file/helm-linux-amd64.tar.gz -f
-curl -o ${path}/file/helm-linux-amd64.tar.gz https://get.helm.sh/helm-${helm_version}-linux-amd64.tar.gz
+rm ${path}/file/helm-linux-arm64.tar.gz -f
+curl -o ${path}/file/helm-linux-amd64.tar.gz https://get.helm.sh/helm-${helm_version}-linux-arm64.tar.gz
 echo "=== helm binary package is saved successfully ==="
